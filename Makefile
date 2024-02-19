@@ -1,10 +1,11 @@
 include .env
 
-CFLAGS = -std=c++17 -I. -I$(VULKAN_SDK_PATH)/include -I$(BREW_INCLUDES_PATH)
-LDFLAGS = -L$(VULKAN_SDK_PATH)/lib -lvulkan -L$(BREW_CELLAR)/glfw/3.3.9/lib -lglfw -rpath /Users/eliahlohr/VulkanSDK/1.3.275.0/macOS/lib
+COMPILERFLAGS = -std=c++17
+INCLUDEFLAGS = -I. -I$(VULKAN_SDK)/include -I$(VULKAN_SDK)/lib -I$(BREW_INCLUDES_PATH)
+LINKERFLAGS = -L$(VULKAN_SDK)/lib -lvulkan -L$(BREW_CELLAR)/glfw/3.3.9/lib -lglfw
 
 a.out: *.cpp *.hpp
-	g++ $(CFLAGS) -o a.out *.cpp $(LDFLAGS)
+	g++ $(COMPILERFLAGS) -o a.out *.cpp $(INCLUDEFLAGS) $(LINKERFLAGS)
 
 .PHONY: test clean
 
