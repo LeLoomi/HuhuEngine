@@ -3,6 +3,11 @@
 #include "huhu_window.hpp"
 #include "huhu_pipeline.hpp"
 #include "huhu_device.hpp"
+#include "huhu_swap_chain.hpp"
+
+// std
+#include <memory>
+#include <vector>
 
 namespace huhu
 {
@@ -12,11 +17,25 @@ namespace huhu
         static constexpr int WIDTH = 800;
         static constexpr int HEIGHT = 600;
 
+        FirstApp();
+        ~FirstApp();
+
+        FirstApp(const FirstApp &) = delete;
+        FirstApp &operator=(const FirstApp &) = delete;
+
         void run();
 
     private:
+        void createPipelineLayout();
+        void createPipeline();
+        void createCommandBuffers();
+        void drawFrame();
+
         HuhuWindow huhuWindow{WIDTH, HEIGHT, "Hoot hoot!"};
         HuhuDevice huhuDevice{huhuWindow};
-        HuhuPipeline huhuPipeline{huhuDevice, "shaders/simple_shader.vert.spv", "shaders/simple_shader.frag.spv", HuhuPipeline::defaultPipelineConfigInfo(WIDTH, HEIGHT)};
+        HuhuSwapChain huhuSwapChain{huhuDevice, huhuWindow.getExtent()};
+        std::unique_ptr<HuhuPipeline> huhuPipeline;
+        VkPipelineLayout pipelineLayout;
+        std::vector<VkCommandBuffer> commandBuffers;
     };
 }
