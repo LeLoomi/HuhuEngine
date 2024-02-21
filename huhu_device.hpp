@@ -41,7 +41,7 @@ namespace huhu
 
         // Not copyable or movable
         HuhuDevice(const HuhuDevice &) = delete;
-        void operator=(const HuhuDevice &) = delete;
+        HuhuDevice &operator=(const HuhuDevice &) = delete;
         HuhuDevice(HuhuDevice &&) = delete;
         HuhuDevice &operator=(HuhuDevice &&) = delete;
 

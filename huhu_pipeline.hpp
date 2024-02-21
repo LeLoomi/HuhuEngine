@@ -31,7 +31,7 @@ namespace huhu
         ~HuhuPipeline();
 
         HuhuPipeline(const HuhuPipeline &) = delete;
-        void operator=(const HuhuPipeline &) = delete;
+        HuhuPipeline &operator=(const HuhuPipeline &) = delete;
 
         void bind(VkCommandBuffer commandBuffer);
 

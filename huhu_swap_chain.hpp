@@ -20,7 +20,7 @@ namespace huhu
         ~HuhuSwapChain();
 
         HuhuSwapChain(const HuhuSwapChain &) = delete;
-        void operator=(const HuhuSwapChain &) = delete;
+        HuhuSwapChain &operator=(const HuhuSwapChain &) = delete;
 
         VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
         VkRenderPass getRenderPass() { return renderPass; }
