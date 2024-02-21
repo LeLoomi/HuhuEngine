@@ -42,7 +42,7 @@ namespace huhu
 
     void FirstApp::createPipelineLayout()
     {
-        VkPipelineLayoutCreateInfo pipelineLayoutInfo;
+        VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         pipelineLayoutInfo.setLayoutCount = 0;
         pipelineLayoutInfo.pSetLayouts = nullptr;
