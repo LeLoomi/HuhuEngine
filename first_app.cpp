@@ -30,12 +30,12 @@ namespace huhu
         vkDeviceWaitIdle(huhuDevice.device()); // have cpu wait for gpu to finish before we shut down
     }
 
-    void FirstApp::loadModels() {
-        std::vector<HuhuModel::Vertex> vertices {
-            {{0.0f, -0.5f}},
-            {{0.5f, 0.5f}},
-            {{-0.5f, 0.5f}}
-        };
+    void FirstApp::loadModels()
+    {
+        std::vector<HuhuModel::Vertex> vertices{
+            {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+            {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+            {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
 
         huhuModel = std::make_unique<HuhuModel>(huhuDevice, vertices);
     }
