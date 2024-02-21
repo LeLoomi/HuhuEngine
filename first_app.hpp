@@ -1,9 +1,11 @@
 #pragma once
 
+// huhu
 #include "huhu_window.hpp"
 #include "huhu_pipeline.hpp"
 #include "huhu_device.hpp"
 #include "huhu_swap_chain.hpp"
+#include "huhu_model.hpp"
 
 // std
 #include <memory>
@@ -26,6 +28,7 @@ namespace huhu
         void run();
 
     private:
+    void loadModels();
         void createPipelineLayout();
         void createPipeline();
         void createCommandBuffers();
@@ -37,5 +40,6 @@ namespace huhu
         std::unique_ptr<HuhuPipeline> huhuPipeline;
         VkPipelineLayout pipelineLayout;
         std::vector<VkCommandBuffer> commandBuffers;
+        std::unique_ptr<HuhuModel> huhuModel;
     };
 }

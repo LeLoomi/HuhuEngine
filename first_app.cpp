@@ -8,6 +8,7 @@ namespace huhu
 {
     FirstApp::FirstApp()
     {
+        loadModels();
         createPipelineLayout();
         createPipeline();
         createCommandBuffers();
@@ -27,6 +28,16 @@ namespace huhu
         }
 
         vkDeviceWaitIdle(huhuDevice.device()); // have cpu wait for gpu to finish before we shut down
+    }
+
+    void FirstApp::loadModels() {
+        std::vector<HuhuModel::Vertex> vertices {
+            {{0.0f, -0.5f}},
+            {{0.5f, 0.5f}},
+            {{-0.5f, 0.5f}}
+        };
+
+        huhuModel = std::make_unique<HuhuModel>(huhuDevice, vertices);
     }
 
     void FirstApp::createPipelineLayout()
@@ -100,7 +111,8 @@ namespace huhu
             vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
             huhuPipeline->bind(commandBuffers[i]);
-            vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+            huhuModel->bind(commandBuffers[i]);
+            huhuModel->draw(commandBuffers[i]);
 
             vkCmdEndRenderPass(commandBuffers[i]);
             if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
