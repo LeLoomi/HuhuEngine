@@ -12,13 +12,13 @@ namespace huhu
      : huhuDevice{device}
     {
         createGraphicsPipeline(vertFilepath, fragFilepath, configInfo);
-    };
+    }
 
     HuhuPipeline::~HuhuPipeline() {
         vkDestroyShaderModule(huhuDevice.device(), vertShaderModule, nullptr);
         vkDestroyShaderModule(huhuDevice.device(), fragShaderModule, nullptr);
         vkDestroyPipeline(huhuDevice.device(), graphicsPipeline, nullptr);
-    };
+    }
 
     std::vector<char> HuhuPipeline::readFile(const std::string &filepath)
     {
@@ -38,7 +38,7 @@ namespace huhu
 
         file.close();
         return buffer;
-    };
+    }
 
     void HuhuPipeline::createGraphicsPipeline(const std::string &vertFilepath, const std::string &fragFilepath, const PipelineConfigInfo &configInfo)
     {
@@ -104,7 +104,7 @@ namespace huhu
         if(vkCreateGraphicsPipelines(huhuDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
             throw std::runtime_error("failed to create graphics pipeline");
         }
-    };
+    }
 
     void HuhuPipeline::createShaderModule(const std::vector<char> &code, VkShaderModule *shaderModule)
     {
@@ -117,7 +117,12 @@ namespace huhu
         {
             throw std::runtime_error("failed to create shader module");
         }
-    };
+    }
+
+    void HuhuPipeline::bind(VkCommandBuffer commandBuffer) {
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+        
+    }
 
     PipelineConfigInfo HuhuPipeline::defaultPipelineConfigInfo(uint32_t width, uint32_t height)
     {
@@ -178,5 +183,5 @@ namespace huhu
         configInfo.colorBlendInfo.blendConstants[3] = 0.0f;     // Optional
 
         return configInfo;
-    };
+    }
 }
