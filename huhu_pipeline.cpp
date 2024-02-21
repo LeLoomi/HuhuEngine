@@ -86,6 +86,10 @@ namespace huhu
         viewportInfo.scissorCount = 1;
         viewportInfo.pScissors = &configInfo.scissor;
 
+        // we need this (not doing anything) info to pass it to the pipeline in order to conform to the vulkan specs.
+        VkPipelineDepthStencilStateCreateInfo depthStencilInfo{};
+        depthStencilInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+
         VkGraphicsPipelineCreateInfo pipelineInfo{};
         pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
         pipelineInfo.stageCount = 2;
@@ -96,7 +100,7 @@ namespace huhu
         pipelineInfo.pRasterizationState = &configInfo.rasterizationInfo;
         pipelineInfo.pMultisampleState = &configInfo.multisampleInfo;
         pipelineInfo.pColorBlendState = &configInfo.colorBlendInfo;
-        pipelineInfo.pDepthStencilState = nullptr;
+        pipelineInfo.pDepthStencilState = &depthStencilInfo;
 
         pipelineInfo.layout = configInfo.pipelineLayout;
         pipelineInfo.renderPass = configInfo.renderPass;
