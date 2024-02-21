@@ -16,6 +16,7 @@ namespace huhu
 
     HuhuPipeline::~HuhuPipeline() {
         vkDestroyShaderModule(huhuDevice.device(), vertShaderModule, nullptr);
+        vkDestroyShaderModule(huhuDevice.device(), fragShaderModule, nullptr);
         vkDestroyPipeline(huhuDevice.device(), graphicsPipeline, nullptr);
     };
 
