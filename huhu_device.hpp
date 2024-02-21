@@ -111,7 +111,7 @@ namespace huhu
         const std::vector<const char *> deviceExtensions = {
             VK_KHR_SWAPCHAIN_EXTENSION_NAME,
             VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME,
-            //didnt work VK_EXT_EXTENDED_DYNAMIC_STATE_3_EXTENSION_NAME  //to make the compiler happy, i dont think it is necessary for us to use here?
+            // didnt work VK_EXT_EXTENDED_DYNAMIC_STATE_3_EXTENSION_NAME  //to make the compiler happy, i dont think it is necessary for us to use here?
         };
     };
 

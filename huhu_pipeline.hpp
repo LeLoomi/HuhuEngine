@@ -12,7 +12,7 @@ namespace huhu
     {
         VkViewport viewport;
         VkRect2D scissor;
-        
+
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
         VkPipelineRasterizationStateCreateInfo rasterizationInfo;
         VkPipelineMultisampleStateCreateInfo multisampleInfo;

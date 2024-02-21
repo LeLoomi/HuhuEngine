@@ -9,12 +9,13 @@ namespace huhu
 {
 
     HuhuPipeline::HuhuPipeline(HuhuDevice &device, const std::string &vertFilepath, const std::string &fragFilepath, const PipelineConfigInfo &configInfo)
-     : huhuDevice{device}
+        : huhuDevice{device}
     {
         createGraphicsPipeline(vertFilepath, fragFilepath, configInfo);
     }
 
-    HuhuPipeline::~HuhuPipeline() {
+    HuhuPipeline::~HuhuPipeline()
+    {
         vkDestroyShaderModule(huhuDevice.device(), vertShaderModule, nullptr);
         vkDestroyShaderModule(huhuDevice.device(), fragShaderModule, nullptr);
         vkDestroyPipeline(huhuDevice.device(), graphicsPipeline, nullptr);
@@ -101,7 +102,8 @@ namespace huhu
         pipelineInfo.basePipelineIndex = -1;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-        if(vkCreateGraphicsPipelines(huhuDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
+        if (vkCreateGraphicsPipelines(huhuDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
+        {
             throw std::runtime_error("failed to create graphics pipeline");
         }
     }
@@ -119,9 +121,9 @@ namespace huhu
         }
     }
 
-    void HuhuPipeline::bind(VkCommandBuffer commandBuffer) {
+    void HuhuPipeline::bind(VkCommandBuffer commandBuffer)
+    {
         vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-        
     }
 
     PipelineConfigInfo HuhuPipeline::defaultPipelineConfigInfo(uint32_t width, uint32_t height)
@@ -151,17 +153,17 @@ namespace huhu
         configInfo.rasterizationInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
         configInfo.rasterizationInfo.depthBiasEnable = VK_FALSE;
 
-        configInfo.rasterizationInfo.depthBiasConstantFactor = 0.0f;    // Optional
-        configInfo.rasterizationInfo.depthBiasClamp = 0.0f;             // Optional
-        configInfo.rasterizationInfo.depthBiasSlopeFactor = 0.0f;       // Optional
+        configInfo.rasterizationInfo.depthBiasConstantFactor = 0.0f; // Optional
+        configInfo.rasterizationInfo.depthBiasClamp = 0.0f;          // Optional
+        configInfo.rasterizationInfo.depthBiasSlopeFactor = 0.0f;    // Optional
 
         configInfo.multisampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
         configInfo.multisampleInfo.sampleShadingEnable = VK_FALSE;
         configInfo.multisampleInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-        configInfo.multisampleInfo.minSampleShading = 1.0f;             // Optional
-        configInfo.multisampleInfo.pSampleMask = nullptr;               // Optional
-        configInfo.multisampleInfo.alphaToCoverageEnable = VK_FALSE;    // Optional
-        configInfo.multisampleInfo.alphaToOneEnable = VK_FALSE;         // Optional
+        configInfo.multisampleInfo.minSampleShading = 1.0f;          // Optional
+        configInfo.multisampleInfo.pSampleMask = nullptr;            // Optional
+        configInfo.multisampleInfo.alphaToCoverageEnable = VK_FALSE; // Optional
+        configInfo.multisampleInfo.alphaToOneEnable = VK_FALSE;      // Optional
 
         configInfo.colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
         configInfo.colorBlendAttachment.blendEnable = VK_FALSE;
@@ -174,13 +176,13 @@ namespace huhu
 
         configInfo.colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
         configInfo.colorBlendInfo.logicOpEnable = VK_FALSE;
-        configInfo.colorBlendInfo.logicOp = VK_LOGIC_OP_COPY;   // Optional
+        configInfo.colorBlendInfo.logicOp = VK_LOGIC_OP_COPY; // Optional
         configInfo.colorBlendInfo.attachmentCount = 1;
         configInfo.colorBlendInfo.pAttachments = &configInfo.colorBlendAttachment;
-        configInfo.colorBlendInfo.blendConstants[0] = 0.0f;     // Optional
-        configInfo.colorBlendInfo.blendConstants[1] = 0.0f;     // Optional
-        configInfo.colorBlendInfo.blendConstants[2] = 0.0f;     // Optional
-        configInfo.colorBlendInfo.blendConstants[3] = 0.0f;     // Optional
+        configInfo.colorBlendInfo.blendConstants[0] = 0.0f; // Optional
+        configInfo.colorBlendInfo.blendConstants[1] = 0.0f; // Optional
+        configInfo.colorBlendInfo.blendConstants[2] = 0.0f; // Optional
+        configInfo.colorBlendInfo.blendConstants[3] = 0.0f; // Optional
 
         return configInfo;
     }
