@@ -38,7 +38,7 @@ namespace huhu
 
     void HuhuWindow::framebufferResizeCallback(GLFWwindow *window, int width, int height) {
         auto huhuWindow = reinterpret_cast<HuhuWindow *>(glfwGetWindowUserPointer(window));
-        huhuWindow->frambufferResized = true;
+        huhuWindow->framebufferResized = true;
         huhuWindow->width = width;
         huhuWindow->height = height;
     }

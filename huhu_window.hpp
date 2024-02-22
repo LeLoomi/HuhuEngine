@@ -18,8 +18,8 @@ namespace huhu
 
         bool shouldClose() { return glfwWindowShouldClose(window); }
         VkExtent2D getExtent() { return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)}; };
-        bool wasWindowResized() { return frambufferResized; };
-        void resetWindowResizedFlag() { frambufferResized = false; };
+        bool wasWindowResized() { return framebufferResized; };
+        void resetWindowResizedFlag() { framebufferResized = false; };
 
         void createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
 
@@ -29,7 +29,7 @@ namespace huhu
 
         int width;
         int height;
-        bool frambufferResized = false;
+        bool framebufferResized = false;
 
         std::string windowName;
         GLFWwindow *window;
