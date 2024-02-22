@@ -14,6 +14,20 @@ namespace huhu
     HuhuSwapChain::HuhuSwapChain(HuhuDevice &deviceRef, VkExtent2D extent)
         : device{deviceRef}, windowExtent{extent}
     {
+        init();
+    }
+
+    HuhuSwapChain::HuhuSwapChain(HuhuDevice &deviceRef, VkExtent2D extent, std::shared_ptr<HuhuSwapChain> previous)
+        : device{deviceRef}, windowExtent{extent}, oldSwapChain{previous}
+    {
+        init();
+
+        oldSwapChain = nullptr; // clean up old swap chain since it's no longer needed
+
+    }
+
+    void HuhuSwapChain::init()
+    {
         createSwapChain();
         createImageViews();
         createRenderPass();
@@ -178,7 +192,7 @@ namespace huhu
         createInfo.presentMode = presentMode;
         createInfo.clipped = VK_TRUE;
 
-        createInfo.oldSwapchain = VK_NULL_HANDLE;
+        createInfo.oldSwapchain = oldSwapChain == nullptr ? VK_NULL_HANDLE : oldSwapChain->swapChain;   // return old swap chain or null if nonexistent
 
         if (vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS)
         {
@@ -410,7 +424,7 @@ namespace huhu
     {
         for (const auto &availablePresentMode : availablePresentModes)
         {
-            if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+            if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR && false)   
             {
                 std::cout << "Present mode: Mailbox" << std::endl;
                 return availablePresentMode;
@@ -424,7 +438,7 @@ namespace huhu
         //   }
         // }
 
-        std::cout << "Present mode: V-Sync" << std::endl;
+        // std::cout << "Present mode: V-Sync" << std::endl; // disabled to prevent console spam
         return VK_PRESENT_MODE_FIFO_KHR;
     }
 

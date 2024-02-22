@@ -21,9 +21,11 @@ namespace huhu
     {
         glfwInit();
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
         window = glfwCreateWindow(width, height, windowName.c_str(), nullptr, nullptr);
+        glfwSetWindowUserPointer(window, this);
+        glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
     }
 
     void HuhuWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR *surface)
@@ -32,5 +34,12 @@ namespace huhu
         {
             throw std::runtime_error("failed to create window surface");
         }
+    }
+
+    void HuhuWindow::framebufferResizeCallback(GLFWwindow *window, int width, int height) {
+        auto huhuWindow = reinterpret_cast<HuhuWindow *>(glfwGetWindowUserPointer(window));
+        huhuWindow->frambufferResized = true;
+        huhuWindow->width = width;
+        huhuWindow->height = height;
     }
 }

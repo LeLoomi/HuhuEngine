@@ -32,11 +32,14 @@ namespace huhu
         void createPipelineLayout();
         void createPipeline();
         void createCommandBuffers();
+        void freeCommandBuffers();
         void drawFrame();
+        void recreateSwapChain();
+        void recordCommandBuffer(int imageIndex);
 
         HuhuWindow huhuWindow{WIDTH, HEIGHT, "Hoot hoot!"};
         HuhuDevice huhuDevice{huhuWindow};
-        HuhuSwapChain huhuSwapChain{huhuDevice, huhuWindow.getExtent()};
+        std::unique_ptr<HuhuSwapChain> huhuSwapChain;
         std::unique_ptr<HuhuPipeline> huhuPipeline;
         VkPipelineLayout pipelineLayout;
         std::vector<VkCommandBuffer> commandBuffers;

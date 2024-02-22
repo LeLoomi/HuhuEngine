@@ -5,7 +5,8 @@
 // vulkan headers
 #include <vulkan/vulkan.h>
 
-// std lib headers
+// std
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -17,6 +18,7 @@ namespace huhu
         static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
         HuhuSwapChain(HuhuDevice &deviceRef, VkExtent2D windowExtent);
+        HuhuSwapChain(HuhuDevice &deviceRef, VkExtent2D windowExtent, std::shared_ptr<HuhuSwapChain> previous);
         ~HuhuSwapChain();
 
         HuhuSwapChain(const HuhuSwapChain &) = delete;
@@ -41,6 +43,7 @@ namespace huhu
         VkResult submitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex);
 
     private:
+        void init();
         void createSwapChain();
         void createImageViews();
         void createDepthResources();
@@ -71,6 +74,7 @@ namespace huhu
         VkExtent2D windowExtent;
 
         VkSwapchainKHR swapChain;
+        std::shared_ptr<HuhuSwapChain> oldSwapChain;
 
         std::vector<VkSemaphore> imageAvailableSemaphores;
         std::vector<VkSemaphore> renderFinishedSemaphores;

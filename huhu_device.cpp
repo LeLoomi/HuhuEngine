@@ -329,11 +329,11 @@ namespace huhu
         std::vector<VkExtensionProperties> extensions(extensionCount);
         vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 
-        std::cout << "available extensions:" << std::endl;
+        // std::cout << "available extensions:" << std::endl;   // disabled to prevent console spam
         std::unordered_set<std::string> available;
         for (const auto &extension : extensions)
         {
-            std::cout << "\t" << extension.extensionName << std::endl;
+            // std::cout << "\t" << extension.extensionName << std::endl;  // disabled to prevent console spam
             available.insert(extension.extensionName);
         }
 
