@@ -10,202 +10,230 @@
 #include <cassert>
 #include <stdexcept>
 
-namespace huhu {
+namespace huhu
+{
 
-struct SimplePushConstantData {
-  glm::vec2 offset;
-  alignas(16) glm::vec3 color;
-};
+    struct SimplePushConstantData
+    {
+        glm::vec2 offset;
+        alignas(16) glm::vec3 color;
+    };
 
-FirstApp::FirstApp() {
-  loadModels();
-  createPipelineLayout();
-  recreateSwapChain();
-  createCommandBuffers();
-}
-
-FirstApp::~FirstApp() { vkDestroyPipelineLayout(huhuDevice.device(), pipelineLayout, nullptr); }
-
-void FirstApp::run() {
-  while (!huhuWindow.shouldClose()) {
-    glfwPollEvents();
-    drawFrame();
-  }
-
-  vkDeviceWaitIdle(huhuDevice.device());
-}
-
-void FirstApp::loadModels() {
-  std::vector<HuhuModel::Vertex> vertices{
-      {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-      {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-      {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
-  huhuModel = std::make_unique<HuhuModel>(huhuDevice, vertices);
-}
-
-void FirstApp::createPipelineLayout() {
-  VkPushConstantRange pushConstantRange{};
-  pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-  pushConstantRange.offset = 0;
-  pushConstantRange.size = sizeof(SimplePushConstantData);
-
-  VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-  pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-  pipelineLayoutInfo.setLayoutCount = 0;
-  pipelineLayoutInfo.pSetLayouts = nullptr;
-  pipelineLayoutInfo.pushConstantRangeCount = 1;
-  pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
-  if (vkCreatePipelineLayout(huhuDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) !=
-      VK_SUCCESS) {
-    throw std::runtime_error("failed to create pipeline layout!");
-  }
-}
-
-void FirstApp::recreateSwapChain() {
-  auto extent = huhuWindow.getExtent();
-  while (extent.width == 0 || extent.height == 0) {
-    extent = huhuWindow.getExtent();
-    glfwWaitEvents();
-  }
-  vkDeviceWaitIdle(huhuDevice.device());
-
-  if (huhuSwapChain == nullptr) {
-    huhuSwapChain = std::make_unique<HuhuSwapChain>(huhuDevice, extent);
-  } else {
-    huhuSwapChain = std::make_unique<HuhuSwapChain>(huhuDevice, extent, std::move(huhuSwapChain));
-    if (huhuSwapChain->imageCount() != commandBuffers.size()) {
-      freeCommandBuffers();
-      createCommandBuffers();
+    FirstApp::FirstApp()
+    {
+        loadModels();
+        createPipelineLayout();
+        recreateSwapChain();
+        createCommandBuffers();
     }
-  }
 
-  createPipeline();
-}
+    FirstApp::~FirstApp() { vkDestroyPipelineLayout(huhuDevice.device(), pipelineLayout, nullptr); }
 
-void FirstApp::createPipeline() {
-  assert(huhuSwapChain != nullptr && "Cannot create pipeline before swap chain");
-  assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+    void FirstApp::run()
+    {
+        while (!huhuWindow.shouldClose())
+        {
+            glfwPollEvents();
+            drawFrame();
+        }
 
-  PipelineConfigInfo pipelineConfig{};
-  HuhuPipeline::defaultPipelineConfigInfo(pipelineConfig);
-  pipelineConfig.renderPass = huhuSwapChain->getRenderPass();
-  pipelineConfig.pipelineLayout = pipelineLayout;
-  huhuPipeline = std::make_unique<HuhuPipeline>(
-      huhuDevice,
-      "shaders/simple_shader.vert.spv",
-      "shaders/simple_shader.frag.spv",
-      pipelineConfig);
-}
+        vkDeviceWaitIdle(huhuDevice.device());
+    }
 
-void FirstApp::createCommandBuffers() {
-  commandBuffers.resize(huhuSwapChain->imageCount());
+    void FirstApp::loadModels()
+    {
+        std::vector<HuhuModel::Vertex> vertices{
+            {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+            {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+            {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
+        huhuModel = std::make_unique<HuhuModel>(huhuDevice, vertices);
+    }
 
-  VkCommandBufferAllocateInfo allocInfo{};
-  allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-  allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-  allocInfo.commandPool = huhuDevice.getCommandPool();
-  allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
+    void FirstApp::createPipelineLayout()
+    {
+        VkPushConstantRange pushConstantRange{};
+        pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+        pushConstantRange.offset = 0;
+        pushConstantRange.size = sizeof(SimplePushConstantData);
 
-  if (vkAllocateCommandBuffers(huhuDevice.device(), &allocInfo, commandBuffers.data()) !=
-      VK_SUCCESS) {
-    throw std::runtime_error("failed to allocate command buffers!");
-  }
-}
+        VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+        pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipelineLayoutInfo.setLayoutCount = 0;
+        pipelineLayoutInfo.pSetLayouts = nullptr;
+        pipelineLayoutInfo.pushConstantRangeCount = 1;
+        pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
+        if (vkCreatePipelineLayout(huhuDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) !=
+            VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to create pipeline layout!");
+        }
+    }
 
-void FirstApp::freeCommandBuffers() {
-  vkFreeCommandBuffers(
-      huhuDevice.device(),
-      huhuDevice.getCommandPool(),
-      static_cast<uint32_t>(commandBuffers.size()),
-      commandBuffers.data());
-  commandBuffers.clear();
-}
+    void FirstApp::recreateSwapChain()
+    {
+        auto extent = huhuWindow.getExtent();
+        while (extent.width == 0 || extent.height == 0)
+        {
+            extent = huhuWindow.getExtent();
+            glfwWaitEvents();
+        }
+        vkDeviceWaitIdle(huhuDevice.device());
 
-void FirstApp::recordCommandBuffer(int imageIndex) {
-  static int frame = 30;
-  frame = (frame + 1) % 100;
+        if (huhuSwapChain == nullptr)
+        {
+            huhuSwapChain = std::make_unique<HuhuSwapChain>(huhuDevice, extent);
+        }
+        else
+        {
+            huhuSwapChain = std::make_unique<HuhuSwapChain>(huhuDevice, extent, std::move(huhuSwapChain));
+            if (huhuSwapChain->imageCount() != commandBuffers.size())
+            {
+                freeCommandBuffers();
+                createCommandBuffers();
+            }
+        }
 
-  VkCommandBufferBeginInfo beginInfo{};
-  beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        createPipeline();
+    }
 
-  if (vkBeginCommandBuffer(commandBuffers[imageIndex], &beginInfo) != VK_SUCCESS) {
-    throw std::runtime_error("failed to begin recording command buffer!");
-  }
+    void FirstApp::createPipeline()
+    {
+        assert(huhuSwapChain != nullptr && "Cannot create pipeline before swap chain");
+        assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
-  VkRenderPassBeginInfo renderPassInfo{};
-  renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-  renderPassInfo.renderPass = huhuSwapChain->getRenderPass();
-  renderPassInfo.framebuffer = huhuSwapChain->getFrameBuffer(imageIndex);
+        PipelineConfigInfo pipelineConfig{};
+        HuhuPipeline::defaultPipelineConfigInfo(pipelineConfig);
+        pipelineConfig.renderPass = huhuSwapChain->getRenderPass();
+        pipelineConfig.pipelineLayout = pipelineLayout;
+        huhuPipeline = std::make_unique<HuhuPipeline>(
+            huhuDevice,
+            "shaders/simple_shader.vert.spv",
+            "shaders/simple_shader.frag.spv",
+            pipelineConfig);
+    }
 
-  renderPassInfo.renderArea.offset = {0, 0};
-  renderPassInfo.renderArea.extent = huhuSwapChain->getSwapChainExtent();
+    void FirstApp::createCommandBuffers()
+    {
+        commandBuffers.resize(huhuSwapChain->imageCount());
 
-  std::array<VkClearValue, 2> clearValues{};
-  clearValues[0].color = {0.01f, 0.01f, 0.01f, 1.0f};
-  clearValues[1].depthStencil = {1.0f, 0};
-  renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-  renderPassInfo.pClearValues = clearValues.data();
+        VkCommandBufferAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.commandPool = huhuDevice.getCommandPool();
+        allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 
-  vkCmdBeginRenderPass(commandBuffers[imageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        if (vkAllocateCommandBuffers(huhuDevice.device(), &allocInfo, commandBuffers.data()) !=
+            VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to allocate command buffers!");
+        }
+    }
 
-  VkViewport viewport{};
-  viewport.x = 0.0f;
-  viewport.y = 0.0f;
-  viewport.width = static_cast<float>(huhuSwapChain->getSwapChainExtent().width);
-  viewport.height = static_cast<float>(huhuSwapChain->getSwapChainExtent().height);
-  viewport.minDepth = 0.0f;
-  viewport.maxDepth = 1.0f;
-  VkRect2D scissor{{0, 0}, huhuSwapChain->getSwapChainExtent()};
-  vkCmdSetViewport(commandBuffers[imageIndex], 0, 1, &viewport);
-  vkCmdSetScissor(commandBuffers[imageIndex], 0, 1, &scissor);
+    void FirstApp::freeCommandBuffers()
+    {
+        vkFreeCommandBuffers(
+            huhuDevice.device(),
+            huhuDevice.getCommandPool(),
+            static_cast<uint32_t>(commandBuffers.size()),
+            commandBuffers.data());
+        commandBuffers.clear();
+    }
 
-  huhuPipeline->bind(commandBuffers[imageIndex]);
-  huhuModel->bind(commandBuffers[imageIndex]);
+    void FirstApp::recordCommandBuffer(int imageIndex)
+    {
+        static int frame = 30;
+        frame = (frame + 1) % 100;
 
-  for (int j = 0; j < 4; j++) {
-    SimplePushConstantData push{};
-    push.offset = {-0.5f + frame * 0.02f, -0.4f + j * 0.25f};
-    push.color = {0.0f, 0.0f, 0.2f + 0.2f * j};
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-    vkCmdPushConstants(
-        commandBuffers[imageIndex],
-        pipelineLayout,
-        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-        0,
-        sizeof(SimplePushConstantData),
-        &push);
-    huhuModel->draw(commandBuffers[imageIndex]);
-  }
+        if (vkBeginCommandBuffer(commandBuffers[imageIndex], &beginInfo) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to begin recording command buffer!");
+        }
 
-  vkCmdEndRenderPass(commandBuffers[imageIndex]);
-  if (vkEndCommandBuffer(commandBuffers[imageIndex]) != VK_SUCCESS) {
-    throw std::runtime_error("failed to record command buffer!");
-  }
-}
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = huhuSwapChain->getRenderPass();
+        renderPassInfo.framebuffer = huhuSwapChain->getFrameBuffer(imageIndex);
 
-void FirstApp::drawFrame() {
-  uint32_t imageIndex;
-  auto result = huhuSwapChain->acquireNextImage(&imageIndex);
+        renderPassInfo.renderArea.offset = {0, 0};
+        renderPassInfo.renderArea.extent = huhuSwapChain->getSwapChainExtent();
 
-  if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-    recreateSwapChain();
-    return;
-  }
+        std::array<VkClearValue, 2> clearValues{};
+        clearValues[0].color = {0.01f, 0.01f, 0.001f, 1.0f};
+        clearValues[1].depthStencil = {1.0f, 0};
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
 
-  if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-    throw std::runtime_error("failed to acquire swap chain image!");
-  }
+        vkCmdBeginRenderPass(commandBuffers[imageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-  recordCommandBuffer(imageIndex);
-  result = huhuSwapChain->submitCommandBuffers(&commandBuffers[imageIndex], &imageIndex);
-  if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||
-      huhuWindow.wasWindowResized()) {
-    huhuWindow.resetWindowResizedFlag();
-    recreateSwapChain();
-    return;
-  } else if (result != VK_SUCCESS) {
-    throw std::runtime_error("failed to present swap chain image!");
-  }
-}
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = static_cast<float>(huhuSwapChain->getSwapChainExtent().width);
+        viewport.height = static_cast<float>(huhuSwapChain->getSwapChainExtent().height);
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        VkRect2D scissor{{0, 0}, huhuSwapChain->getSwapChainExtent()};
+        vkCmdSetViewport(commandBuffers[imageIndex], 0, 1, &viewport);
+        vkCmdSetScissor(commandBuffers[imageIndex], 0, 1, &scissor);
 
-}  // namespace lve
+        huhuPipeline->bind(commandBuffers[imageIndex]);
+        huhuModel->bind(commandBuffers[imageIndex]);
+
+        for (int j = 0; j < 4; j++)
+        {
+            SimplePushConstantData push{};
+            push.offset = {-0.5f + frame * 0.02f, -0.4f + j * 0.25f};
+            push.color = {0.0f, 0.0f, 0.2f + 0.2f * j};
+
+            vkCmdPushConstants(
+                commandBuffers[imageIndex],
+                pipelineLayout,
+                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                0,
+                sizeof(SimplePushConstantData),
+                &push);
+            huhuModel->draw(commandBuffers[imageIndex]);
+        }
+
+        vkCmdEndRenderPass(commandBuffers[imageIndex]);
+        if (vkEndCommandBuffer(commandBuffers[imageIndex]) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to record command buffer!");
+        }
+    }
+
+    void FirstApp::drawFrame()
+    {
+        uint32_t imageIndex;
+        auto result = huhuSwapChain->acquireNextImage(&imageIndex);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            recreateSwapChain();
+            return;
+        }
+
+        if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+        {
+            throw std::runtime_error("failed to acquire swap chain image!");
+        }
+
+        recordCommandBuffer(imageIndex);
+        result = huhuSwapChain->submitCommandBuffers(&commandBuffers[imageIndex], &imageIndex);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||
+            huhuWindow.wasWindowResized())
+        {
+            huhuWindow.resetWindowResizedFlag();
+            recreateSwapChain();
+            return;
+        }
+        else if (result != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to present swap chain image!");
+        }
+    }
+
+} // namespace lve
