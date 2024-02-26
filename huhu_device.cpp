@@ -102,8 +102,8 @@ namespace huhu
         createInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
 
         auto extensions = getRequiredExtensions();
-        extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);    // required for macOS afaict
-        extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);   // required by khr portability enumeration extension
+        extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);          // required for macOS afaict
+        extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME); // required by khr portability enumeration extension
         createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         createInfo.ppEnabledExtensionNames = extensions.data();
 
@@ -329,19 +329,19 @@ namespace huhu
         std::vector<VkExtensionProperties> extensions(extensionCount);
         vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 
-        // std::cout << "available extensions:" << std::endl;   // disabled to prevent console spam
+        std::cout << "available extensions:" << std::endl;   // clutters console on boot #1
         std::unordered_set<std::string> available;
         for (const auto &extension : extensions)
         {
-            // std::cout << "\t" << extension.extensionName << std::endl;  // disabled to prevent console spam
+            std::cout << "\t" << extension.extensionName << std::endl;    // clutters console on boot #1
             available.insert(extension.extensionName);
         }
 
-        std::cout << "required extensions:" << std::endl;
+        std::cout << "required extensions:" << std::endl;   // clutters console on boot #2
         auto requiredExtensions = getRequiredExtensions();
         for (const auto &required : requiredExtensions)
         {
-            std::cout << "\t" << required << std::endl;
+            std::cout << "\t" << required << std::endl;  // clutters console on boot #2
             if (available.find(required) == available.end())
             {
                 throw std::runtime_error("Missing required glfw extension");
@@ -612,4 +612,4 @@ namespace huhu
         }
     }
 
-} // namespace lve
+}

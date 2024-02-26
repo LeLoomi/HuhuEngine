@@ -2,7 +2,7 @@
 
 #include "huhu_window.hpp"
 
-#include <vulkan/vulkan_beta.h>
+#include <vulkan/vulkan_beta.h> // only beta header supports VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME which is needed for proper M1 support 
 
 // std lib headers
 #include <string>
