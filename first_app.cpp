@@ -18,6 +18,7 @@ namespace huhu
         glm::vec2 offset;
         glm::vec3 color;
     };
+
     FirstApp::FirstApp()
     {
         loadModels();
@@ -65,8 +66,8 @@ namespace huhu
         pipelineLayoutInfo.pSetLayouts = nullptr;
         pipelineLayoutInfo.pushConstantRangeCount = 1;
         pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
-        // i think here we could fix some compiler saltyness: pipelineLayoutInfo.flags = something_correct;
-        if (vkCreatePipelineLayout(huhuDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
+        if (vkCreatePipelineLayout(huhuDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) !=
+            VK_SUCCESS)
         {
             throw std::runtime_error("failed to create pipeline layout!");
         }
