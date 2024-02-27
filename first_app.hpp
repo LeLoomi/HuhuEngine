@@ -2,10 +2,9 @@
 
 // huhu
 #include "huhu_window.hpp"
-#include "huhu_pipeline.hpp"
 #include "huhu_device.hpp"
-#include "huhu_swap_chain.hpp"
 #include "huhu_game_object.hpp"
+#include "huhu_renderer.hpp"
 
 // std
 #include <memory>
@@ -29,21 +28,11 @@ namespace huhu
 
     private:
         void loadGameObjects();
-        void createPipelineLayout();
-        void createPipeline();
-        void createCommandBuffers();
-        void freeCommandBuffers();
-        void drawFrame();
-        void recreateSwapChain();
-        void recordCommandBuffer(int imageIndex);
-        void renderGameObjects(VkCommandBuffer commandBuffer);
 
         HuhuWindow huhuWindow{WIDTH, HEIGHT, "Hoot hoot!"};
         HuhuDevice huhuDevice{huhuWindow};
-        std::unique_ptr<HuhuSwapChain> huhuSwapChain;
-        std::unique_ptr<HuhuPipeline> huhuPipeline;
-        VkPipelineLayout pipelineLayout;
-        std::vector<VkCommandBuffer> commandBuffers;
+        HuhuRenderer huhuRenderer{huhuWindow, huhuDevice};
+
         std::vector<HuhuGameObject> gameObjects;
     };
 }
