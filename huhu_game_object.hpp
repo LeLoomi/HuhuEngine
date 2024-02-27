@@ -10,8 +10,18 @@ namespace huhu
     struct Transform2dComponent
     {
         glm::vec2 translation{}; // (position offset)
+        glm::vec2 scale{1.f, 1.f};
+        float rotation;
 
-        glm::mat2 mat2() { return glm::mat2{1.f}; };
+        glm::mat2 mat2()
+        {
+            const float s = glm::sin(rotation);
+            const float c = glm::cos(rotation);
+            glm::mat2 rotMat{{c, s}, {-s, c}};   // see https://mathworld.wolfram.com/RotationMatrix.html
+
+            glm::mat2 scaleMat = {{scale.x, 0.f}, {0.f, scale.y}}; // mat2 takes matrix as columns! { {col1}, {col2} }
+            return rotMat * scaleMat;
+        };
     };
 
     class HuhuGameObject
