@@ -15,13 +15,14 @@ namespace huhu
 
     struct SimplePushConstantData
     {
+        glm::mat2 transform{1.f};
         glm::vec2 offset;
         alignas(16) glm::vec3 color;
     };
 
     FirstApp::FirstApp()
     {
-        loadModels();
+        loadGameObjects();
         createPipelineLayout();
         recreateSwapChain();
         createCommandBuffers();
@@ -40,13 +41,20 @@ namespace huhu
         vkDeviceWaitIdle(huhuDevice.device());
     }
 
-    void FirstApp::loadModels()
+    void FirstApp::loadGameObjects()
     {
         std::vector<HuhuModel::Vertex> vertices{
             {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
             {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
             {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
-        huhuModel = std::make_unique<HuhuModel>(huhuDevice, vertices);
+        auto huhuModel = std::make_shared<HuhuModel>(huhuDevice, vertices);
+
+        auto triangle = HuhuGameObject::createGameObject();
+        triangle.model = huhuModel;
+        triangle.color = {.1f, .8f, .1f};
+        triangle.transform2d.translation.x = .2f;
+
+        gameObjects.push_back(std::move(triangle));
     }
 
     void FirstApp::createPipelineLayout()
@@ -141,9 +149,6 @@ namespace huhu
 
     void FirstApp::recordCommandBuffer(int imageIndex)
     {
-        static int frame = 30;
-        frame = (frame + 1) % 100;
-
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -179,29 +184,36 @@ namespace huhu
         vkCmdSetViewport(commandBuffers[imageIndex], 0, 1, &viewport);
         vkCmdSetScissor(commandBuffers[imageIndex], 0, 1, &scissor);
 
-        huhuPipeline->bind(commandBuffers[imageIndex]);
-        huhuModel->bind(commandBuffers[imageIndex]);
-
-        for (int j = 0; j < 4; j++)
-        {
-            SimplePushConstantData push{};
-            push.offset = {-0.5f + frame * 0.02f, -0.4f + j * 0.25f};
-            push.color = {0.0f, 0.0f, 0.2f + 0.2f * j};
-
-            vkCmdPushConstants(
-                commandBuffers[imageIndex],
-                pipelineLayout,
-                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-                0,
-                sizeof(SimplePushConstantData),
-                &push);
-            huhuModel->draw(commandBuffers[imageIndex]);
-        }
+        renderGameObjects(commandBuffers[imageIndex]);
 
         vkCmdEndRenderPass(commandBuffers[imageIndex]);
         if (vkEndCommandBuffer(commandBuffers[imageIndex]) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to record command buffer!");
+        }
+    }
+
+    void FirstApp::renderGameObjects(VkCommandBuffer commandBuffer)
+    {
+        huhuPipeline->bind(commandBuffer);
+
+        for (auto &obj : gameObjects)
+        {
+            SimplePushConstantData push{};
+            push.offset = obj.transform2d.translation;
+            push.color = obj.color;
+            push.transform = obj.transform2d.mat2();
+
+            vkCmdPushConstants(
+                commandBuffer,
+                pipelineLayout,
+                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                0,
+                sizeof(SimplePushConstantData),
+                &push);
+
+            obj.model->bind(commandBuffer);
+            obj.model->draw(commandBuffer);
         }
     }
 
@@ -235,5 +247,4 @@ namespace huhu
             throw std::runtime_error("failed to present swap chain image!");
         }
     }
-
-} // namespace lve
+}
