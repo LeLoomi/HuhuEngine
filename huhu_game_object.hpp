@@ -2,25 +2,30 @@
 
 #include "huhu_model.hpp"
 
+// libs
+#include <glm/gtc/matrix_transform.hpp>
+
 // std
 #include <memory>
 
 namespace huhu
 {
-    struct Transform2dComponent
+    struct TransformComponent
     {
-        glm::vec2 translation{}; // (position offset)
-        glm::vec2 scale{1.f, 1.f};
-        float rotation;
+        glm::vec3 translation{}; // (position offset)
+        glm::vec3 scale{1.f, 1.f, 1.f};
+        glm::vec3 rotation;
 
-        glm::mat2 mat2()
+        // Matrix corresponds to translate * Ry * Rx * Rz * scale transform
+        // Rotation order uses Tait-Bryan angles with axis order Y(1), X(2), Y(3)
+        glm::mat4 mat4()
         {
-            const float s = glm::sin(rotation);
-            const float c = glm::cos(rotation);
-            glm::mat2 rotMat{{c, s}, {-s, c}};   // see https://mathworld.wolfram.com/RotationMatrix.html
-
-            glm::mat2 scaleMat = {{scale.x, 0.f}, {0.f, scale.y}}; // mat2 takes matrix as columns! { {col1}, {col2} }
-            return rotMat * scaleMat;
+            auto transform = glm::translate(glm::mat4{1.f}, translation);
+            transform = glm::rotate(transform, rotation.y, {0.f, 1.f, 0.f});
+            transform = glm::rotate(transform, rotation.x, {1.f, 0.f, 0.f});
+            transform = glm::rotate(transform, rotation.z, {0.f, 0.f, 1.f});
+            transform = glm::scale(transform, scale);
+            return transform;
         };
     };
 
@@ -44,7 +49,7 @@ namespace huhu
 
         std::shared_ptr<HuhuModel> model{};
         glm::vec3 color{};
-        Transform2dComponent transform2d{};
+        TransformComponent transform{};
 
     private:
         HuhuGameObject(id_t objId) : id{objId} {};
