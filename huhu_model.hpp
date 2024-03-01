@@ -24,7 +24,13 @@ namespace huhu
             static std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions();
         };
 
-        HuhuModel(HuhuDevice &device, const std::vector<Vertex> &vertices);
+        struct Builder
+        {
+            std::vector<Vertex> vertices{};
+            std::vector<uint32_t> indices{};
+        };
+
+        HuhuModel(HuhuDevice &device, const HuhuModel::Builder &builder);
         ~HuhuModel();
 
         HuhuModel(const HuhuModel &) = delete;
@@ -35,10 +41,17 @@ namespace huhu
 
     private:
         void createVertexBuffers(const std::vector<Vertex> &vertices);
+        void createIndexBuffers(const std::vector<uint32_t> &indices);
 
         HuhuDevice &huhuDevice;
+
         VkBuffer vertexBuffer;
         VkDeviceMemory vertexBufferMemory;
         uint32_t vertexCount;
+
+        bool hasIndexBuffer = false;
+        VkBuffer indexBuffer;
+        VkDeviceMemory indexBufferMemory;
+        uint32_t indexCount;
     };
 }
