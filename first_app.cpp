@@ -2,6 +2,7 @@
 
 #include "huhu_camera.hpp"
 #include "simple_render_system.hpp"
+#include "keyboard_movement_controller.hpp"
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -11,6 +12,7 @@
 
 // std
 #include <array>
+#include <chrono>
 #include <cassert>
 #include <stdexcept>
 
@@ -27,12 +29,22 @@ namespace huhu
     {
         SimpleRenderSystem simpleRenderSystem{huhuDevice, huhuRenderer.getSwapChainRenderPass()};
         HuhuCamera camera{};
-        // camera.setViewDirection(glm::vec3(0.f), glm::vec3(.5f, 0.f, 1.f));
-        camera.setViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
+
+        auto viewerObject = HuhuGameObject::createGameObject();
+        KeyboardMovementController cameraController{};
+
+        auto currentTime = std::chrono::high_resolution_clock::now();
 
         while (!huhuWindow.shouldClose())
         {
             glfwPollEvents();
+
+            auto newTime = std::chrono::high_resolution_clock::now();
+            float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+            currentTime = newTime;
+
+            cameraController.moveInPlaneYXZ(huhuWindow.getGlfwWindow(), frameTime, viewerObject);
+            camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
             float aspect = huhuRenderer.getAspectRatio();
             // camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
@@ -53,8 +65,7 @@ namespace huhu
     // temporary helper function, created 1x1x1 cube centered at offset
     std::unique_ptr<HuhuModel> createCubeModel(HuhuDevice &device, glm::vec3 offset)
     {
-        std::vector<HuhuModel::Vertex> vertices
-        {
+        std::vector<HuhuModel::Vertex> vertices{
             // left face (white)
             {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
             {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
@@ -101,9 +112,11 @@ namespace huhu
             {{-.5f, .5f, -.5f}, {.1f, .8f, .1f}},
             {{-.5f, -.5f, -.5f}, {.1f, .8f, .1f}},
             {{.5f, -.5f, -.5f}, {.1f, .8f, .1f}},
-            {{.5f, .5f, -.5f}, {.1f, .8f, .1f}}
-        };
-        for(auto &v : vertices) { v.position += offset; }
+            {{.5f, .5f, -.5f}, {.1f, .8f, .1f}}};
+        for (auto &v : vertices)
+        {
+            v.position += offset;
+        }
         return std::make_unique<HuhuModel>(device, vertices);
     }
 
