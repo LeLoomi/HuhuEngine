@@ -22,6 +22,7 @@ namespace huhu
         HuhuRenderer &operator=(const HuhuRenderer &) = delete;
 
         VkRenderPass getSwapChainRenderPass() const { return huhuSwapChain->getRenderPass(); }
+        float getAspectRatio() const { return huhuSwapChain->extentAspectRatio(); }
         bool isFrameInProgress() const { return isFrameStarted; }
 
         VkCommandBuffer getCurrentCommandBuffer() const

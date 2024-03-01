@@ -63,7 +63,7 @@ namespace huhu
             pipelineConfig);
     }
 
-    void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<HuhuGameObject> &gameObjects)
+    void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<HuhuGameObject> &gameObjects, const HuhuCamera &camera)
     {
         huhuPipeline->bind(commandBuffer);
 
@@ -74,7 +74,7 @@ namespace huhu
 
             SimplePushConstantData push{};
             push.color = obj.color;
-            push.transform = obj.transform.mat4();
+            push.transform = camera.getProjection() * obj.transform.mat4();
 
             vkCmdPushConstants(
                 commandBuffer,

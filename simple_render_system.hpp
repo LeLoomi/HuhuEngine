@@ -1,6 +1,7 @@
 #pragma once
 
 // huhu
+#include "huhu_camera.hpp"
 #include "huhu_pipeline.hpp"
 #include "huhu_device.hpp"
 #include "huhu_game_object.hpp"
@@ -20,7 +21,7 @@ namespace huhu
         SimpleRenderSystem(const SimpleRenderSystem &) = delete;
         SimpleRenderSystem &operator=(const SimpleRenderSystem &) = delete;
 
-        void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<HuhuGameObject> &gameObjects);
+        void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<HuhuGameObject> &gameObjects, const HuhuCamera &camera);
 
     private:
         void createPipelineLayout();
