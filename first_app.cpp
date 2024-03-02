@@ -65,11 +65,11 @@ namespace huhu
     void FirstApp::loadGameObjects()
     {
         std::shared_ptr<HuhuModel> huhuModel =
-            HuhuModel::createModelFromFile(huhuDevice, "models/smooth_vase.obj");
+            HuhuModel::createModelFromFile(huhuDevice, "models/flat_vase.obj");
         auto gameObj = HuhuGameObject::createGameObject();
         gameObj.model = huhuModel;
         gameObj.transform.translation = {.0f, .0f, 2.5f};
-        gameObj.transform.scale = {.5f, .5f, .5f};
+        gameObj.transform.scale = {2.5f, 2.5f, 2.5f};
 
         gameObjects.push_back(std::move(gameObj));
     }
