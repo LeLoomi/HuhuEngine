@@ -5,6 +5,7 @@
 #include "huhu_pipeline.hpp"
 #include "huhu_device.hpp"
 #include "huhu_game_object.hpp"
+#include "huhu_frame_info.hpp"
 
 // std
 #include <memory>
@@ -21,7 +22,9 @@ namespace huhu
         SimpleRenderSystem(const SimpleRenderSystem &) = delete;
         SimpleRenderSystem &operator=(const SimpleRenderSystem &) = delete;
 
-        void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<HuhuGameObject> &gameObjects, const HuhuCamera &camera);
+        void renderGameObjects(
+            FrameInfo frameInfo,
+            std::vector<HuhuGameObject> &gameObjects);
 
     private:
         void createPipelineLayout();

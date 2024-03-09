@@ -3,6 +3,7 @@
 #include "huhu_camera.hpp"
 #include "simple_render_system.hpp"
 #include "keyboard_movement_controller.hpp"
+#include "huhu_buffer.hpp"
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -18,6 +19,12 @@
 
 namespace huhu
 {
+    struct GlobalUbo
+    {
+        glm::mat4 projectionView{1.f};
+        glm::vec3 lightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
+    };
+
     FirstApp::FirstApp()
     {
         loadGameObjects();
@@ -27,6 +34,18 @@ namespace huhu
 
     void FirstApp::run()
     {
+        std::vector<std::unique_ptr<HuhuBuffer>> uboBuffers(HuhuSwapChain::MAX_FRAMES_IN_FLIGHT);
+        for (int i = 0; i < uboBuffers.size(); i++)
+        {
+            uboBuffers[i] = std::make_unique<HuhuBuffer>(
+                huhuDevice,
+                sizeof(GlobalUbo),
+                1,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+            uboBuffers[i]->map();
+        }
+
         SimpleRenderSystem simpleRenderSystem{huhuDevice, huhuRenderer.getSwapChainRenderPass()};
         HuhuCamera camera{};
 
@@ -52,8 +71,22 @@ namespace huhu
 
             if (auto commandBuffer = huhuRenderer.beginFrame())
             {
+                int frameIndex = huhuRenderer.getFrameIndex();
+                FrameInfo frameInfo{
+                    frameIndex,
+                    frameTime,
+                    commandBuffer,
+                    camera};
+
+                // updating
+                GlobalUbo ubo{};
+                ubo.projectionView = camera.getProjection() * camera.getView();
+                uboBuffers[frameIndex]->writeToBuffer(&ubo);
+                uboBuffers[frameIndex]->flush();
+
+                // rendering
                 huhuRenderer.beginSwapChainRenderPass(commandBuffer);
-                simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects, camera);
+                simpleRenderSystem.renderGameObjects(frameInfo, gameObjects);
                 huhuRenderer.endSwapChainRenderPass(commandBuffer);
                 huhuRenderer.endFrame();
             }
@@ -68,7 +101,7 @@ namespace huhu
             HuhuModel::createModelFromFile(huhuDevice, "models/flat_vase.obj");
         auto gameObj = HuhuGameObject::createGameObject();
         gameObj.model = huhuModel;
-        gameObj.transform.translation = {.0f, .0f, 2.5f};
+        gameObj.transform.translation = {.0f, 0.5f, 2.5f};
         gameObj.transform.scale = {2.5f, 2.5f, 2.5f};
 
         gameObjects.push_back(std::move(gameObj));

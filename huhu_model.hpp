@@ -1,6 +1,7 @@
 #pragma once
 
 #include "huhu_device.hpp"
+#include "huhu_buffer.hpp"
 
 // libs
 #define GLM_FORCE_RADIANS           // make glm use radians over degrees on every OS
@@ -60,13 +61,11 @@ namespace huhu
 
         HuhuDevice &huhuDevice;
 
-        VkBuffer vertexBuffer;
-        VkDeviceMemory vertexBufferMemory;
+        std::unique_ptr<HuhuBuffer> vertexBuffer; 
         uint32_t vertexCount;
 
         bool hasIndexBuffer = false;
-        VkBuffer indexBuffer;
-        VkDeviceMemory indexBufferMemory;
+        std::unique_ptr<HuhuBuffer> indexBuffer;
         uint32_t indexCount;
     };
 }
