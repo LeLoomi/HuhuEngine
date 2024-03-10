@@ -5,6 +5,7 @@
 #include "huhu_device.hpp"
 #include "huhu_game_object.hpp"
 #include "huhu_renderer.hpp"
+#include "huhu_descriptors.hpp"
 
 // std
 #include <memory>
@@ -33,6 +34,7 @@ namespace huhu
         HuhuDevice huhuDevice{huhuWindow};
         HuhuRenderer huhuRenderer{huhuWindow, huhuDevice};
 
+        std::unique_ptr<HuhuDescriptorPool> globalPool{};
         std::vector<HuhuGameObject> gameObjects;
     };
 }

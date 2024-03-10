@@ -16,7 +16,7 @@ namespace huhu
     class SimpleRenderSystem
     {
     public:
-        SimpleRenderSystem(HuhuDevice &device, VkRenderPass renderPass);
+        SimpleRenderSystem(HuhuDevice &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
         ~SimpleRenderSystem();
 
         SimpleRenderSystem(const SimpleRenderSystem &) = delete;
@@ -27,7 +27,7 @@ namespace huhu
             std::vector<HuhuGameObject> &gameObjects);
 
     private:
-        void createPipelineLayout();
+        void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
         void createPipeline(VkRenderPass renderPass);
 
         HuhuDevice &huhuDevice;

@@ -2,5 +2,6 @@
 .VSCodeCounter/
 
 *.out
+*.spv
 .env
 .DS_Store

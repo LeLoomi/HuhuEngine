@@ -21,12 +21,16 @@ namespace huhu
 {
     struct GlobalUbo
     {
-        glm::mat4 projectionView{1.f};
-        glm::vec3 lightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
+        alignas(16) glm::mat4 projectionView{1.f};
+        alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
     };
 
     FirstApp::FirstApp()
     {
+        globalPool = HuhuDescriptorPool::Builder(huhuDevice)
+                         .setMaxSets(HuhuSwapChain::MAX_FRAMES_IN_FLIGHT)
+                         .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, HuhuSwapChain::MAX_FRAMES_IN_FLIGHT)
+                         .build();
         loadGameObjects();
     }
 
@@ -46,7 +50,23 @@ namespace huhu
             uboBuffers[i]->map();
         }
 
-        SimpleRenderSystem simpleRenderSystem{huhuDevice, huhuRenderer.getSwapChainRenderPass()};
+        auto globalSetLayout = HuhuDescriptorSetLayout::Builder(huhuDevice)
+                                   .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+                                   .build();
+
+        std::vector<VkDescriptorSet> globalDescriptorSets(HuhuSwapChain::MAX_FRAMES_IN_FLIGHT);
+        for (int i = 0; i < globalDescriptorSets.size(); i++)
+        {
+            auto bufferInfo = uboBuffers[i]->descriptorInfo();
+            HuhuDescriptorWriter(*globalSetLayout, *globalPool)
+                .writeBuffer(0, &bufferInfo)
+                .build(globalDescriptorSets[i]);
+        }
+
+        SimpleRenderSystem simpleRenderSystem{
+            huhuDevice,
+            huhuRenderer.getSwapChainRenderPass(),
+            globalSetLayout->getDescriptorSetLayout()};
         HuhuCamera camera{};
 
         auto viewerObject = HuhuGameObject::createGameObject();
@@ -76,7 +96,8 @@ namespace huhu
                     frameIndex,
                     frameTime,
                     commandBuffer,
-                    camera};
+                    camera,
+                    globalDescriptorSets[frameIndex]};
 
                 // updating
                 GlobalUbo ubo{};

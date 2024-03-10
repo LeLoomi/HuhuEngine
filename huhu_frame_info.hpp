@@ -13,5 +13,6 @@ namespace huhu
         float frameTime;
         VkCommandBuffer commandBuffer;
         HuhuCamera &camera;
+        VkDescriptorSet globalDescriptorSet;
     };
 }
