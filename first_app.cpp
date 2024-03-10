@@ -21,8 +21,11 @@ namespace huhu
 {
     struct GlobalUbo
     {
-        alignas(16) glm::mat4 projectionView{1.f};
-        alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
+        glm::mat4 projectionView{1.f};
+        // glm::vec3 lightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
+        glm::vec4 ambientLightColor{1.f, 1.f, 1.f, .02f};
+        glm::vec3 lightPosition{-1.f};
+        alignas(16) glm::vec4 lightColor{1.f}; // w is light intensity
     };
 
     FirstApp::FirstApp()
@@ -70,6 +73,7 @@ namespace huhu
         HuhuCamera camera{};
 
         auto viewerObject = HuhuGameObject::createGameObject();
+        viewerObject.transform.translation.z = -2.5f;
         KeyboardMovementController cameraController{};
 
         auto currentTime = std::chrono::high_resolution_clock::now();
@@ -87,7 +91,7 @@ namespace huhu
 
             float aspect = huhuRenderer.getAspectRatio();
             // camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
-            camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 10.f);
+            camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 250.f);    // last value is view distance
 
             if (auto commandBuffer = huhuRenderer.beginFrame())
             {
@@ -118,13 +122,27 @@ namespace huhu
 
     void FirstApp::loadGameObjects()
     {
-        std::shared_ptr<HuhuModel> huhuModel =
-            HuhuModel::createModelFromFile(huhuDevice, "models/flat_vase.obj");
-        auto gameObj = HuhuGameObject::createGameObject();
-        gameObj.model = huhuModel;
-        gameObj.transform.translation = {.0f, 0.5f, 2.5f};
-        gameObj.transform.scale = {2.5f, 2.5f, 2.5f};
+        std::shared_ptr<HuhuModel> huhuModel;
 
-        gameObjects.push_back(std::move(gameObj));
+        huhuModel = HuhuModel::createModelFromFile(huhuDevice, "models/flat_vase.obj");
+        auto flatVase = HuhuGameObject::createGameObject();
+        flatVase.model = huhuModel;
+        flatVase.transform.translation = {-.5f, .5f, .0f};
+        flatVase.transform.scale = {3.f, 1.5f, 3.f};
+        gameObjects.push_back(std::move(flatVase));
+
+        huhuModel = HuhuModel::createModelFromFile(huhuDevice, "models/smooth_vase.obj");
+        auto smoothVase = HuhuGameObject::createGameObject();
+        smoothVase.model = huhuModel;
+        smoothVase.transform.translation = {.5f, .5f, .0f};
+        smoothVase.transform.scale = {3.f, 1.5f, 3.f};
+        gameObjects.push_back(std::move(smoothVase));
+
+        huhuModel = HuhuModel::createModelFromFile(huhuDevice, "models/quad.obj");
+        auto floor = HuhuGameObject::createGameObject();
+        floor.model = huhuModel;
+        floor.transform.translation = {.0f, 0.5f, .0f};
+        floor.transform.scale = {3.f, 1.f, 3.f};
+        gameObjects.push_back(std::move(floor));
     }
 }
