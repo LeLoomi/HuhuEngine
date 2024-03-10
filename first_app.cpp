@@ -53,9 +53,10 @@ namespace huhu
             uboBuffers[i]->map();
         }
 
-        auto globalSetLayout = HuhuDescriptorSetLayout::Builder(huhuDevice)
-                                   .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
-                                   .build();
+        auto globalSetLayout =
+            HuhuDescriptorSetLayout::Builder(huhuDevice)
+                .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
+                .build();
 
         std::vector<VkDescriptorSet> globalDescriptorSets(HuhuSwapChain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < globalDescriptorSets.size(); i++)
@@ -91,7 +92,7 @@ namespace huhu
 
             float aspect = huhuRenderer.getAspectRatio();
             // camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
-            camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 250.f);    // last value is view distance
+            camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 250.f); // last value is view distance
 
             if (auto commandBuffer = huhuRenderer.beginFrame())
             {
