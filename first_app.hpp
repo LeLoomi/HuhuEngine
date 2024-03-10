@@ -35,6 +35,6 @@ namespace huhu
         HuhuRenderer huhuRenderer{huhuWindow, huhuDevice};
 
         std::unique_ptr<HuhuDescriptorPool> globalPool{};
-        std::vector<HuhuGameObject> gameObjects;
+        HuhuGameObject::Map gameObjects;
     };
 }

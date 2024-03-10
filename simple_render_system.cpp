@@ -65,7 +65,7 @@ namespace huhu
             pipelineConfig);
     }
 
-    void SimpleRenderSystem::renderGameObjects(FrameInfo frameInfo, std::vector<HuhuGameObject> &gameObjects)
+    void SimpleRenderSystem::renderGameObjects(FrameInfo &frameInfo)
     {
         huhuPipeline->bind(frameInfo.commandBuffer);
 
@@ -80,8 +80,12 @@ namespace huhu
             nullptr // dynamic offsets data
         );
 
-        for (auto &obj : gameObjects)
+        for (auto &kv : frameInfo.gameObjects)
         {
+            auto &obj = kv.second;
+            if (obj.model == nullptr)
+                continue; // we dont need to do model stuff with obj without models; iterating like this is still inefficient 
+            
             SimplePushConstantData push{};
             push.modelMatrix = obj.transform.mat4();
             push.normalMatrix = obj.transform.normalMatrix();
