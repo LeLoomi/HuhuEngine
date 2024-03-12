@@ -1,7 +1,14 @@
 .vscode/
 .VSCodeCounter/
+temp/
 
-*.out
-*.spv
 .env
 .DS_Store
+
+# Build system related
+Build/
+CMakeFiles/
+
+# No binaries or compile results
+HuhuEngine
+*.spv
