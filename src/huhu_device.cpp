@@ -611,5 +611,4 @@ namespace huhu
             throw std::runtime_error("failed to bind image memory!");
         }
     }
-
 }

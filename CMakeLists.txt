@@ -18,10 +18,10 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/src/*.cpp)
 # target_sources(${PROJECT_NAME} PUBLIC ${SOURCES})
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_include_directories(${PROJECT_NAME} PUBLIC 
+target_include_directories(${PROJECT_NAME} PUBLIC
+    ${VULKAN_SDK_PATH}/include
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/external/tinyobjloader
-    ${VULKAN_SDK_PATH}/include
     ${GLFW_PATH}/include
 )
 
