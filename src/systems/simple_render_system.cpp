@@ -13,7 +13,6 @@
 
 namespace huhu
 {
-
     struct SimplePushConstantData
     {
         glm::mat4 modelMatrix{1.f};

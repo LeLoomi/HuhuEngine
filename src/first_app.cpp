@@ -1,7 +1,8 @@
 #include "first_app.hpp"
 
 #include "huhu_camera.hpp"
-#include "simple_render_system.hpp"
+#include "systems/simple_render_system.hpp"
+#include "systems/point_light_system.hpp"
 #include "keyboard_movement_controller.hpp"
 #include "huhu_buffer.hpp"
 
@@ -21,7 +22,8 @@ namespace huhu
 {
     struct GlobalUbo
     {
-        glm::mat4 projectionView{1.f};
+        glm::mat4 projection{1.f};
+        glm::mat4 view{1.f};
         // glm::vec3 lightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
         glm::vec4 ambientLightColor{1.f, 1.f, 1.f, .02f};
         glm::vec3 lightPosition{-1.f};
@@ -71,6 +73,10 @@ namespace huhu
             huhuDevice,
             huhuRenderer.getSwapChainRenderPass(),
             globalSetLayout->getDescriptorSetLayout()};
+        PointLightSystem pointLightSystem{
+            huhuDevice,
+            huhuRenderer.getSwapChainRenderPass(),
+            globalSetLayout->getDescriptorSetLayout()};
         HuhuCamera camera{};
 
         auto viewerObject = HuhuGameObject::createGameObject();
@@ -107,13 +113,15 @@ namespace huhu
 
                 // updating
                 GlobalUbo ubo{};
-                ubo.projectionView = camera.getProjection() * camera.getView();
+                ubo.projection = camera.getProjection();
+                ubo.view = camera.getView();
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
                 // rendering
                 huhuRenderer.beginSwapChainRenderPass(commandBuffer);
                 simpleRenderSystem.renderGameObjects(frameInfo);
+                pointLightSystem.render(frameInfo);
                 huhuRenderer.endSwapChainRenderPass(commandBuffer);
                 huhuRenderer.endFrame();
             }

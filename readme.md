@@ -7,10 +7,10 @@ Currently just me following the Vulkan tutorial :P
 
 ## Run-reqs
 
-- CMake <sup>v3.28.0 req.</sup>
+- CMake <sup>v3.28.0+ req.</sup>
 - Ninja
-- VulkanSDK <sup>v1.3.275.0 rec.</sup>
-- TinyObjLoader <sup>[this version](https://github.com/tinyobjloader/tinyobjloader/blob/release/tiny_obj_loader.h)</sup>
+- VulkanSDK <sup>v1.3.275.0+ rec.</sup>
+- TinyObjLoader <sup>(included, [this version](https://github.com/tinyobjloader/tinyobjloader/blob/release/tiny_obj_loader.h) req.)</sup>
 
 <br />
 
