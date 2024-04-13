@@ -54,4 +54,14 @@ namespace huhu
              invScale.z * (-s2),
              invScale.z * (c1 * c2)}};
     }
+
+    HuhuGameObject HuhuGameObject::makePointLight(float intensity, float radius, glm::vec3 color)
+    {
+        HuhuGameObject gameObj = HuhuGameObject::createGameObject();
+        gameObj.color = color;
+        gameObj.transform.scale.x = radius;
+        gameObj.pointLight = std::make_unique<PointLightComponent>();
+        gameObj.pointLight->lightIntesity = intensity;
+        return gameObj;
+    };
 }

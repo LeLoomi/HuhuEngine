@@ -24,6 +24,11 @@ namespace huhu
         glm::mat3 normalMatrix();
     };
 
+    struct PointLightComponent
+    {
+        float lightIntesity = 1.0f;
+    };
+
     class HuhuGameObject
     {
     public:
@@ -36,6 +41,9 @@ namespace huhu
             return HuhuGameObject(currentId++);
         }
 
+        static HuhuGameObject makePointLight(
+            float intensity = 10.f, float radius = 0.1f, glm::vec3 color = glm::vec3(1.f));
+
         HuhuGameObject(const HuhuGameObject &) = delete;
         HuhuGameObject &operator=(const HuhuGameObject &) = delete;
         HuhuGameObject(HuhuGameObject &&) = default;
@@ -43,9 +51,12 @@ namespace huhu
 
         const id_t getId() { return id; };
 
-        std::shared_ptr<HuhuModel> model{};
         glm::vec3 color{};
         TransformComponent transform{};
+
+        // Optional pointer components
+        std::shared_ptr<HuhuModel> model{};
+        std::unique_ptr<PointLightComponent> pointLight = nullptr;
 
     private:
         HuhuGameObject(id_t objId) : id{objId} {};

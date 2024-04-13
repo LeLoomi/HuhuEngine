@@ -11,24 +11,33 @@ const vec2 OFFSETS[6] = vec2[](
 
 layout (location = 0) out vec2 fragOffset;
 
+struct PointLight {
+    vec4 position;  // ignore w
+    vec4 color;     // w is intensity
+};
+
 layout(set = 0, binding = 0) uniform GlobalUbo {
     mat4 projection;
     mat4 view;
     vec4 ambientLightColor; // w is light intensity
-    vec3 lightPosition;
-    vec4 lightColor;
+    PointLight pointLights[10]; // needs to match MAX_LIGHTS in huhu_frame_info.hpp (GH Issue #4)
+    int numLights;
 } ubo;
 
-const float LIGHT_RADIUS = 0.05f;
+layout(push_constant) uniform Push {
+    vec4 position;
+    vec4 color;
+    float radius;
+} push;
 
 void main() {
     fragOffset = OFFSETS[gl_VertexIndex];
     vec3 cameraWorldRight = {ubo.view[0][0], ubo.view[1][0], ubo.view[2][0]};
     vec3 cameraWorldUp = {ubo.view[0][1], ubo.view[1][1], ubo.view[2][1]};
 
-    vec3 positionWorld = ubo.lightPosition.xyz
-        + LIGHT_RADIUS * fragOffset.x * cameraWorldRight
-        + LIGHT_RADIUS * fragOffset.y * cameraWorldUp;
+    vec3 positionWorld = push.position.xyz
+        + push.radius * fragOffset.x * cameraWorldRight
+        + push.radius * fragOffset.y * cameraWorldUp;
 
     gl_Position = ubo.projection * ubo.view * vec4(positionWorld, 1.0);
 }
