@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28.0)
+cmake_minimum_required(VERSION 4.00.0)
 set (CMAKE_CXX_STANDARD 17)
 
 #---------------------------#
@@ -6,7 +6,7 @@ set(PROJECT_NAME HuhuEngine)
 set(PROJECT_VERSION 0.1.43)
 
 set(COMPILER_PATH "/usr/bin/g++")
-set(VULKAN_SDK_PATH "/Users/eliahlohr/VulkanSDK/1.3.275.0/macOS")
+set(VULKAN_SDK_PATH "/Users/eliah/VulkanSDK/1.4.313.1/macOS")
 set(GLFW_PATH "/opt/homebrew/Cellar/GLFW/3.4")
 #---------------------------#
 
